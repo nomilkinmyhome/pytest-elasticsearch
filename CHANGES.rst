@@ -4,6 +4,12 @@ CHANGELOG
 unreleased
 ----------
 
+Backward incompatibilities
+++++++++++++++++++++++++++
+
+- Package now requires elasticsearch client at minimum version 8.0.0
+- AS a result, it will now also require server 7.0.0 or higher.
+
 CI
 ++
 
