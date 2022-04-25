@@ -51,7 +51,7 @@ jobs:
     env:
       OS: ubuntu-latest
       PYTHON: ${{ matrix.python-version }}
-      ES_JAVA_OPTS: "-Xms512m -Xmx512m"
+      ES_JAVA_OPTS: "-Xms256m -Xmx512m"
     steps:
       - uses: actions/checkout@v3
       - uses: ./.github/actions/pytest
