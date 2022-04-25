@@ -39,7 +39,7 @@ runs:
   - name: Run test ${{ inputs.elasticsearch }}
     shell: bash
     run: |
-      pytest --elasticsearch-executable=/home/runner/es/elasticsearch-${{ inputs.elasticsearch }}/bin/elasticsearch -n 0 --cov-report=xml
+      ES_JAVA_OPTS="-Xms512m -Xmx512m" pytest --elasticsearch-executable=/home/runner/es/elasticsearch-${{ inputs.elasticsearch }}/bin/elasticsearch -n 0 --cov-report=xml
   - name: Run xdist test ${{ inputs.elasticsearch }}
     shell: bash
     run: |
