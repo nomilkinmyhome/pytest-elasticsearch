@@ -1,5 +1,6 @@
 """Elasticsearch executor."""
 
+import base64
 import re
 from subprocess import check_output
 
@@ -10,7 +11,7 @@ from pkg_resources import parse_version
 class NoopElasticsearch:  # pylint:disable=too-few-public-methods
     """No operation Elasticsearch executor mock."""
 
-    def __init__(self, host, port):
+    def __init__(self, host, port, http_auth=None):
         """
         Initialize Elasticsearch executor mock
         :param str host: hostname under which elasticsearch is available
@@ -18,6 +19,10 @@ class NoopElasticsearch:  # pylint:disable=too-few-public-methods
         """
         self.host = host
         self.port = port
+
+        if http_auth is not None:
+            self.login = http_auth['login']
+            self.password = http_auth['password']
 
     @staticmethod
     def running():
@@ -42,6 +47,7 @@ class ElasticSearchExecutor(HTTPExecutor):
         network_publish_host,
         index_store_type,
         timeout,
+        http_auth,
     ):  # pylint:disable=too-many-arguments
         """
         Initialize ElasticSearchExecutor.
@@ -59,6 +65,7 @@ class ElasticSearchExecutor(HTTPExecutor):
         :param str index_store_type: type of the index to use in the
             elasticsearch process fixture
         :param int timeout: Time after which to give up to start elasticsearch
+        :param dict http_auth: credentials (e.g. {'login': 'elastic', 'password': 'elastic'})
         """
         self._version = None
         self.executable = executable
@@ -71,10 +78,21 @@ class ElasticSearchExecutor(HTTPExecutor):
         self.cluster_name = cluster_name
         self.network_publish_host = network_publish_host
         self.index_store_type = index_store_type
+        self.http_auth = http_auth
+
+        if self.http_auth is not None:
+            login = self.http_auth['login']
+            password = self.http_auth['password']
+            token = base64.b64encode(f'{login}:{password}'.encode())
+            headers = {'Authorization': f'Basic {token}'}
+        else:
+            headers = None
+
         super().__init__(
             self._exec_command(),
             f"http://{self.host}:{self.port}",
             timeout=timeout,
+            headers=headers,
         )
 
     @property

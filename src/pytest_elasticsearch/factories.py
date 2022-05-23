@@ -131,12 +131,13 @@ def elasticsearch_proc(
     return elasticsearch_proc_fixture
 
 
-def elasticsearch_noproc(host=None, port=None):
+def elasticsearch_noproc(host=None, port=None, http_auth=None):
     """
     Elasticsearch noprocess factory.
 
     :param str host: hostname
     :param str|int port: exact port (e.g. '8000', 8000)
+    :param dict http_auth: credentials (e.g. {'login': 'elastic', 'password': 'elastic'})
     :rtype: func
     :returns: function which makes a elasticsearch process
     """
@@ -154,7 +155,7 @@ def elasticsearch_noproc(host=None, port=None):
         pg_host = host or config["host"]
         pg_port = port or config["port"] or 9300
 
-        noop_exec = NoopElasticsearch(host=pg_host, port=pg_port)
+        noop_exec = NoopElasticsearch(host=pg_host, port=pg_port, http_auth=http_auth)
 
         yield noop_exec
 
@@ -175,7 +176,10 @@ def elasticsearch(process_fixture_name):
         if not process.running():
             process.start()
 
-        client = Elasticsearch([{"host": process.host, "port": process.port}])
+        client = Elasticsearch(
+            [{"host": process.host, "port": process.port}],
+            http_auth=(process.http_auth.user, process.http_auth.password),
+        )
 
         def drop_indexes():
             client.indices.delete(index="*")
