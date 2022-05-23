@@ -178,7 +178,7 @@ def elasticsearch(process_fixture_name):
 
         client = Elasticsearch(
             [{"host": process.host, "port": process.port}],
-            http_auth=(process.http_auth.user, process.http_auth.password),
+            http_auth=(process.http_auth['login'], process.http_auth['password']),
         )
 
         def drop_indexes():

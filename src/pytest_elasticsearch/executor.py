@@ -19,10 +19,7 @@ class NoopElasticsearch:  # pylint:disable=too-few-public-methods
         """
         self.host = host
         self.port = port
-
-        if http_auth is not None:
-            self.login = http_auth['login']
-            self.password = http_auth['password']
+        self.http_auth = http_auth
 
     @staticmethod
     def running():
